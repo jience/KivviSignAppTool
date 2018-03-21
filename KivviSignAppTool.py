@@ -1,11 +1,36 @@
 import os
 import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
+from PyQt5.QtCore import QThread, pyqtSignal
 from ui_signapp import Ui_Form
+from subprocess import *
+
+
+class SignThread(QThread):
+    _signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent=None)
+        self.cmd = []
+
+    def setCmd(self, cmd):
+        self.cmd = cmd
+
+    def run(self):
+        os.chdir('source')
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(self.cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=si)
+        os.chdir('../')
+        while True:
+            line = p.stdout.readline().decode()
+            if line is None or line == '':
+                break
+            self._signal.emit(str(line))
 
 
 class SignApp(QWidget, Ui_Form):
-
     def __init__(self):
         super(SignApp, self).__init__()
         self.setupUi(self)
@@ -15,6 +40,9 @@ class SignApp(QWidget, Ui_Form):
             self.pushButton_keyPath.clicked.connect(self.btn_keyPath_Clicked)
             self.pushButton_signedApkPath.clicked.connect(self.btn_SignedApkPath_Clicked)
             self.pushButton_sign.clicked.connect(self.btn_sign_Clicked)
+            self.pushButton_cleanLog.clicked.connect(self.btn_clean_log_clicked)
+            self.signend = SignThread()
+            self.signend._signal.connect(self.print_log)
         except Exception as e:
             print(e)
 
@@ -30,16 +58,17 @@ class SignApp(QWidget, Ui_Form):
 
             args = ['java', '-jar', 'kivvi_sign.jar', certPath, keyPath, apkPath,
                    signedApkPath + '\\' + signed_apk_file_name]
-            os.chdir('source')
-            p = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            os.chdir('../')
-
-            self.textBrowser_log.setText("")
-            for line in p.stdout.readlines():
-                self.textBrowser_log.append(line.decode())
+            self.signend.setCmd(args)
+            self.signend.start()
 
         except Exception as e:
             print(e)
+
+    def btn_clean_log_clicked(self):
+        self.textBrowser_log.setText("")
+
+    def print_log(self, log):
+        self.textBrowser_log.append(log)
 
     def btn_apkPath_Clicked(self):
         filename, filetype = QFileDialog.getOpenFileName(self, "Select Apk File", "./", "APK Files (*.apk)")
@@ -69,6 +98,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     mainwindow = SignApp()
-    mainwindow.setWindowTitle("KivviSignAppToolV1.0")
+    mainwindow.setWindowTitle("KivviSignAppToolV1.1")
     mainwindow.show()
     sys.exit(app.exec_())

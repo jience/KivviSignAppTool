@@ -57,6 +57,9 @@ class Ui_Form(object):
         self.verticalLayout_2.addLayout(self.gridLayout)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.pushButton_cleanLog = QtWidgets.QPushButton(Form)
+        self.pushButton_cleanLog.setObjectName("pushButton_cleanLog")
+        self.horizontalLayout.addWidget(self.pushButton_cleanLog)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.pushButton_sign = QtWidgets.QPushButton(Form)
@@ -87,6 +90,7 @@ class Ui_Form(object):
         self.pushButton_keyPath.setText(_translate("Form", "..."))
         self.label_signedApkPath.setText(_translate("Form", "Signed Apk Path:"))
         self.pushButton_signedApkPath.setText(_translate("Form", "..."))
+        self.pushButton_cleanLog.setText(_translate("Form", "Clean"))
         self.pushButton_sign.setText(_translate("Form", "Sign"))
         self.groupBox_log.setTitle(_translate("Form", "Log"))
 
