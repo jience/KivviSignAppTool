@@ -3,7 +3,6 @@ import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 from PyQt5.QtCore import QThread, pyqtSignal
 from ui_signapp import Ui_Form
-from subprocess import *
 
 
 class SignThread(QThread):
@@ -34,6 +33,8 @@ class SignApp(QWidget, Ui_Form):
     def __init__(self):
         super(SignApp, self).__init__()
         self.setupUi(self)
+        self.lineEdit_certPath.setText(os.path.abspath(r'source/app_kivvi.der'))
+        self.lineEdit_keyPath.setText(os.path.abspath(r'source/app_kivvi_privkey.pk8'))
         try:
             self.pushButton_apkPath.clicked.connect(self.btn_apkPath_Clicked)
             self.pushButton_certPath.clicked.connect(self.btn_certPath_Clicked)
@@ -55,9 +56,11 @@ class SignApp(QWidget, Ui_Form):
 
             apk_file_name = os.path.basename(apkPath)
             signed_apk_file_name = os.path.splitext(apk_file_name)[0] + '-signed.apk'
+            java_home = r'jdk\bin\java.exe'
+            java_path = r'jdk\bin'
 
-            args = ['java', '-jar', 'kivvi_sign.jar', certPath, keyPath, apkPath,
-                   signedApkPath + '\\' + signed_apk_file_name]
+            args = [java_home, '-jar', 'kivvi_sign.jar', certPath, keyPath, apkPath,
+                   signedApkPath + '\\' + signed_apk_file_name, java_path]
             self.signend.setCmd(args)
             self.signend.start()
 

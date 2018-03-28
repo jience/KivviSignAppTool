@@ -1,4 +1,4 @@
-import os
+import os, sys
 import shutil
 import zipfile
 from PyInstaller.__main__ import run
@@ -10,6 +10,8 @@ if __name__ == '__main__':
     script_name = 'KivviSignAppTool'
     # 图标文件，如果没有就写 None
     icon_file = 'icon.ico'
+    # 附加依赖库路径，如果没有就写 None
+    exlib_path = os.path.dirname(sys.executable) + r'\Lib\site-packages\PyQt5\Qt\bin'
 
     def _clean():
         clean_dirs = ['build', 'dist']
@@ -43,10 +45,13 @@ if __name__ == '__main__':
         opts = [spec_file, '-F']
     else:
         script_file = '{}.py'.format(script_name)
-        opts = ['KivviSignAppTool.py', '-F']  # 不知道为什么打包命令添加 -w 参数程序总是运行失败???
+        opts = ['KivviSignAppTool.py', '-F', '-w']
         if icon_file is not None:
             opts.append('-i')
             opts.append(icon_file)
+        if exlib_path is not None:
+            opts.append('-p')
+            opts.append(exlib_path)
 
     _copy_dir()
     run(opts)
