@@ -101,6 +101,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     mainwindow = SignApp()
-    mainwindow.setWindowTitle("KivviSignAppToolV1.1")
+    mainwindow.setWindowTitle("KivviSignAppToolV1.2")
     mainwindow.show()
     sys.exit(app.exec_())
